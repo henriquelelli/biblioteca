@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   web:
-    image: php:8.1-apache
+    build: .
     container_name: web_app
     ports:
       - "8080:80"
     volumes:
       - ./app:/var/www/html
-      - ./apache-config:/etc/apache2/sites-available
+      - ./apache-config.conf:/etc/apache2/sites-available/000-default.conf
     depends_on:
       - db
     restart: always
