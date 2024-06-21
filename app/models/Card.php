@@ -30,8 +30,9 @@ class Card {
     }
 
     public function getFavorites() {
-        $stmt = $this->pdo->query("SELECT * FROM cards WHERE is_favorite = TRUE ORDER BY title");
+        $stmt = $this->pdo->query("SELECT * FROM cards ORDER BY is_favorite DESC, id ASC");
         return $stmt->fetchAll();
-    }
+    }    
+    
 }
 ?>

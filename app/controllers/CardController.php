@@ -10,6 +10,25 @@ class CardController {
 
     public function index() {
         $cards = $this->card->getAll();
+        ob_start();
+        foreach ($cards as $card) {
+            $isFavoriteClass = $card['is_favorite'] ? 'heart-filled' : 'heart-outline';
+            echo "<div class='card'>
+                    <img src='{$card['image_url']}' alt='{$card['title']}'>
+                    <button class='heart-button {$isFavoriteClass}' onclick='toggleFavorite({$card['id']})'></button>
+                    <button class='trash-button' onclick='openModal({$card['id']}, \"{$card['title']}\")'><img src='/images/trash.svg' alt='Delete'></button>
+                    <div class='card-content'>
+                        <h3>{$card['title']}</h3>
+                        <p>{$card['description']}</p>
+                    </div>
+                  </div>";
+        }
+        $content = ob_get_clean();
+        include __DIR__ . '/../views/index.phtml';
+    }
+
+    public function showAddForm() {
+        $content = file_get_contents(__DIR__ . '/../views/add_card.php');
         include __DIR__ . '/../views/index.phtml';
     }
 
@@ -22,7 +41,7 @@ class CardController {
             $this->card->add($title, $description, $image_url);
             header("Location: /");
         } else {
-            include __DIR__ . '/../views/add_card.php';
+            $this->showAddForm();
         }
     }
 
@@ -38,7 +57,21 @@ class CardController {
 
     public function favorites() {
         $cards = $this->card->getFavorites();
-        include __DIR__ . '/../views/index.php';
+        ob_start();
+        foreach ($cards as $card) {
+            $isFavoriteClass = $card['is_favorite'] ? 'heart-filled' : 'heart-outline';
+            echo "<div class='card'>
+                    <img src='{$card['image_url']}' alt='{$card['title']}'>
+                    <button class='heart-button {$isFavoriteClass}' onclick='toggleFavorite({$card['id']})'></button>
+                    <button class='trash-button' onclick='openModal({$card['id']}, \"{$card['title']}\")'><img src='/images/trash.svg' alt='Delete'></button>
+                    <div class='card-content'>
+                        <h3>{$card['title']}</h3>
+                        <p>{$card['description']}</p>
+                    </div>
+                  </div>";
+        }
+        $content = ob_get_clean();
+        include __DIR__ . '/../views/index.phtml';
     }
 }
 ?>

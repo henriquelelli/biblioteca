@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quadro com Quadrados</title>
+    <title>Biblioteca de livros</title>
     <style>
         body, html {
             height: 100%;
@@ -13,7 +13,7 @@
         .header {
             color: white;
             position: relative;
-            height: 57px;
+            height: 52px;
             width: 100%;
             display: flex;
             justify-content: center; 
@@ -22,12 +22,12 @@
             padding-right: 20px;
         }
         .quadro {
-            background-color: #E8F8FF;
+            background-color: #E8EBED;
             border-radius: 8px;
             width: 95%;
             max-width: 1600px;
             height: 80%;
-            max-height: 600px;
+            max-height: 480px;
             border: 1px solid #ccc;
             overflow-y: auto;
             padding: 10px;
@@ -43,23 +43,89 @@
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             font-size: 18px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
         }
-        .favoritos-container {
+        .card img {
+            width: 100%;
+            height: 67%;
+            object-fit: cover;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .card-content {
+            height: 33%;
+            background-color: #d8d8d8;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            position: relative;
+        }
+        .card-content h3 {
+            margin: 0;
+            font-size: 1em;
+        }
+        .card-content p {
+            margin: 5px 0 0;
+            font-size: 0.875em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .heart-button {
+            position: absolute;
+            top: 90px;
+            right: 5px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+        }
+        .heart-outline {
+            background: url('/images/heart-outline.png') no-repeat center center;
+            background-size: contain;
+        }
+        .heart-filled {
+            background: url('/images/heart-filled.png') no-repeat center center;
+            background-size: contain;
+        }
+        .trash-button {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            z-index: 10;
+        }
+        .trash-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .filter-container {
             color: white;
             position: relative;
-            height: 57px;
+            height: 52px;
             width: 100%;
             display: flex;
-            justify-content: right; 
+            justify-content: flex-end; 
             align-items: center; 
             background-color: white;
+            gap: 10px; /* Adiciona um espaço entre os botões */
         }
-        .favoritos-button {
-            top: 103px;
-            margin-right: 20px;
+        .filter-button {
+            margin-right: 10px;
             background-color: #004085;
             color: white;
             padding: 7px 22px;
@@ -74,7 +140,7 @@
             top: 550px;
             right: 80px;
             z-index: 1800;
-            background-color: lightblue;
+            background-color: #4FD1FF;
             color: white;
             padding: 7px 22px;
             border: none;
@@ -87,8 +153,48 @@
         .fixed-adicionar:hover {
             background-color: #e0a800;
         }
-        .favoritos-button:hover {
+        .filter-button:hover {
             background-color: #e0a800;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .modal-content h2 {
+            margin: 0 0 20px;
+        }
+        .modal-content button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content .cancel {
+            background-color: red;
+            color: white;
+        }
+        .modal-content .confirm {
+            background-color: green;
+            color: white;
         }
     </style>
 </head>
@@ -98,29 +204,68 @@
             <h1 class="my-4">Biblioteca de livros</h1>
         </div>
     </div>
-    <div class="favoritos-container">
-        <button class="favoritos-button" onclick="window.location.href='/favorites'">Favoritos</button>
+    <div class="filter-container">
+        <button class="filter-button" onclick="window.location.href='/favorites.php'">Favoritos</button>
+        <button class="filter-button" onclick="window.location.href='/'">Limpar Filtros</button>
     </div>
     <div class="quadro" id="meuQuadro">
-        <button class="fixed-adicionar" onclick="window.location.href='/add'">Adicionar</button>
+        <button class="fixed-adicionar" onclick="window.location.href='/add.php'">Adicionar</button>
 
-        <!-- Aqui serão adicionados os quadrados -->
+        <!-- Aqui serão adicionados os cards dinamicamente -->
+        <?php echo $content; ?>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalMessage">Deseja excluir o livro?</h2>
+            <button class="cancel" onclick="closeModal()">Cancelar</button>
+            <button class="confirm" id="confirmDelete">Confirmar</button>
+        </div>
     </div>
 
     <script>
-        // Função para adicionar os 16 quadrados
-        function adicionarQuadrados() {
-            var quadro = document.getElementById('meuQuadro');
-            for (var i = 1; i <= 16; i++) {
-                var quadrado = document.createElement('div');
-                quadrado.className = 'card';
-                quadrado.textContent = i;
-                quadro.appendChild(quadrado);
-            }
+        <?php if (isset($script)) echo $script; ?>
+        
+        function toggleFavorite(id) {
+            fetch(`/favorite.php?id=${id}`, { method: 'GET' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
 
-        // Chama a função para adicionar os quadrados ao carregar a página
-        adicionarQuadrados();
+        let deleteId = null;
+
+        function openModal(id, name) {
+            deleteId = id;
+            document.getElementById('modalMessage').textContent = `Deseja excluir o livro ${name}?`;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (deleteId) {
+                fetch(`/delete.php?id=${deleteId}`, { method: 'GET' })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('deleteModal')) {
+                closeModal();
+            }
+        }
     </script>
 </body>
 </html>
